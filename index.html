@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Aquahero – Report Case</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h2>Aquahero – Community Health Report</h2>
+
+<form id="reportForm">
+  <label>Village Name</label><br>
+  <input type="text" id="village" required><br><br>
+
+  <label>Symptom</label><br>
+  <select id="symptom">
+    <option>Diarrhea</option>
+    <option>Fever</option>
+    <option>Vomiting</option>
+    <option>Other</option>
+  </select><br><br>
+
+  <label>Water Quality</label><br>
+  <select id="water">
+    <option>Clear</option>
+    <option>Dirty</option>
+    <option>Smelly</option>
+  </select><br><br>
+
+  <button type="submit">Submit Report</button>
+</form>
+
+<p id="status"></p>
+<hr>
+<a href="map.html">🗺 View Map</a> |
+<a href="dashboard.html">🚨 View Alerts</a> |
+<a href="awareness.html">🧼 Awareness</a>
+
+
+<script src="js/app.js"></script>
+</body>
+</html>
