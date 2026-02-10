@@ -1,28 +1,29 @@
-document.getElementById("reportForm").addEventListener("submit", function(e) {
+const form = document.getElementById("reportForm");
+const status = document.getElementById("status");
+
+function getReports() {
+  return JSON.parse(localStorage.getItem("reports") || "[]");
+}
+
+function saveReports(reports) {
+  localStorage.setItem("reports", JSON.stringify(reports));
+}
+
+form.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  let report = {
+  const report = {
     village: document.getElementById("village").value,
     symptom: document.getElementById("symptom").value,
     water: document.getElementById("water").value,
     time: new Date().toISOString()
   };
 
-  let rawEvents =
-  JSON.parse(localStorage.getItem("raw_events")) || [];
+  const reports = getReports();
+  reports.push(report);
+  saveReports(reports);
 
-  rawEvents.push({
-    event_id: Date.now(),          // unique event
-    source: "citizen",             // future-proofing
-    payload: report,               // raw payload
-    ingested_at: new Date().toISOString()
-  });
+  status.innerText = "✅ Report saved locally";
 
-  localStorage.setItem("raw_events", JSON.stringify(rawEvents));
-
-
-  document.getElementById("status").innerText =
-    "Saved locally. Will sync when online.";
-
-  this.reset();
+  form.reset();
 });

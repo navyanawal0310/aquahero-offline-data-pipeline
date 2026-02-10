@@ -1,35 +1,72 @@
-// Initialize map (India view)
-var map = L.map('map').setView([22.9734, 78.6569], 5);
+// Initialize map
+const map = L.map('map').setView([20.5937, 78.9629], 5); // India center
 
-// Add OpenStreetMap tiles
+// Load map tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// Load reports
-let reports = JSON.parse(localStorage.getItem("reports")) || [];
+// Get reports from localStorage
+function getReports() {
+  return JSON.parse(localStorage.getItem("reports") || "[]");
+}
 
-// Temporary village coordinates (mock data)
-let villageCoords = {
-  "Village A": [28.61, 77.20],
-  "Village B": [25.59, 85.13],
-  "Village C": [19.07, 72.87]
+// Generate outbreak alerts (same logic as dashboard)
+function getOutbreakVillages(reports) {
+  const now = new Date();
+  const grouped = {};
+
+  reports.forEach(r => {
+    const key = r.village + "_" + r.symptom;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(r);
+  });
+
+  const outbreakVillages = new Set();
+
+  Object.keys(grouped).forEach(key => {
+    const recent = grouped[key].filter(r => {
+      const diff = (now - new Date(r.time)) / (1000 * 60 * 60);
+      return diff <= 24;
+    });
+
+    if (recent.length >= 3) {
+      const [village] = key.split("_");
+      outbreakVillages.add(village);
+    }
+  });
+
+  return outbreakVillages;
+}
+
+// Dummy coordinates for villages (prototype only)
+const villageCoords = {
+  "VillageA": [28.6, 77.2],
+  "VillageB": [19.0, 72.8],
+  "VillageC": [13.0, 80.2]
 };
 
-// Plot reports
-reports.forEach(r => {
-  if (villageCoords[r.village]) {
-    let color = (r.symptom === "Diarrhea") ? "red" : "green";
+// Show markers
+function showMarkers() {
+  const reports = getReports();
+  const outbreakVillages = getOutbreakVillages(reports);
 
-    L.circleMarker(villageCoords[r.village], {
-      color: color,
-      radius: 8
-    })
-    .addTo(map)
-    .bindPopup(
-      `<b>${r.village}</b><br>
-       Symptom: ${r.symptom}<br>
-       Water: ${r.water}`
-    );
-  }
-});
+  Object.keys(villageCoords).forEach(village => {
+    const coords = villageCoords[village];
+
+    const isAlert = outbreakVillages.has(village);
+
+    const marker = L.circleMarker(coords, {
+      radius: 10,
+      color: isAlert ? "red" : "green",
+      fillOpacity: 0.7
+    }).addTo(map);
+
+    marker.bindPopup(`
+      <b>${village}</b><br>
+      Status: ${isAlert ? "🚨 Outbreak detected" : "Normal"}
+    `);
+  });
+}
+
+showMarkers();

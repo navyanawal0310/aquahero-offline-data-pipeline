@@ -1,57 +1,35 @@
-# Aquahero   
-Offline Community Health Data Pipeline (Prototype)
-Aquahero is an offline-first, community-driven health monitoring prototype designed
-to capture, process, and analyze water-borne disease signals in low-infrastructure
-environments.
-This project focuses on **data ingestion, processing, and rule-based aggregation**
-rather than UI complexity.
+# Aquahero – Offline Community Health Early Warning System
+
+Aquahero is a lightweight, offline-first community health monitoring prototype
+designed to detect early signals of water-borne disease outbreaks in rural areas.
+
+## Key Features
+
+- Community case reporting (citizens, students, health workers)
+- Offline local data storage
+- Rule-based outbreak detection (≥3 cases in 24 hrs)
+- Dashboard alert visualization
+- Map-based outbreak markers
+- Browser notification alerts
+- Mini analytics (cases per village)
+- CSV export for health authorities
+
+## Data Pipeline Demonstrated
+
+Event → Local Storage → Cleaning → Aggregation → Alert → Visualization → Export
+
+## Tech Stack
+
+- HTML, CSS, JavaScript
+- LocalStorage (offline data layer)
+- Chart.js (analytics)
+- Leaflet.js (map visualization)
+
+## Why this project matters
+
+Shows **data engineering + analytics thinking** applied to
+**real public-health problems in low-infrastructure environments**.
 
 ---
 
-## Problem Statement
-Water-borne diseases in rural and semi-urban areas often go undetected until outbreaks
-spread widely. Centralized reporting systems introduce delays and miss early signals.
-Aquahero explores a decentralized, offline-first approach where communities act as
-data producers.
-
----
-
-## Data Engineering Focus
-This prototype demonstrates **core data engineering concepts** using a lightweight
-local setup:
-
-- Event-based data ingestion
-- Offline data buffering (local storage)
-- Staging vs processed data layers
-- Deduplication logic
-- Batch aggregation by location
-- Rule-based anomaly detection
-- Exportable analytical datasets (CSV)
-
----
-
-## Data Flow Architecture
-
-User Event  
-->Raw Event Store (`raw_events`)  
-->Cleaning & Deduplication  
-->Aggregated Metrics  
-->Alerts & Exportable Outputs  
-
-This simulates real-world ingestion latency and batch processing.
-
----
-
-## Data Model (Prototype)
-
-```json
-{
-  "event_id": "number",
-  "source": "citizen | student | health_worker",
-  "village": "string",
-  "symptom": "enum",
-  "severity": "enum",
-  "water_quality": "enum",
-  "event_time": "ISO-8601",
-  "ingested_at": "ISO-8601"
-}
+Created as a Design Thinking & Data Systems prototype.
