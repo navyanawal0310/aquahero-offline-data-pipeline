@@ -16,14 +16,28 @@ form.addEventListener("submit", function (e) {
     village: document.getElementById("village").value,
     symptom: document.getElementById("symptom").value,
     water: document.getElementById("water").value,
+    severity: document.getElementById("severity").value,
     time: new Date().toISOString()
+    
   };
 
-  const reports = getReports();
-  reports.push(report);
-  saveReports(reports);
+// Save locally (offline-first)
+const reports = getReports();
+reports.push(report);
+saveReports(reports);
 
-  status.innerText = "✅ Report saved locally";
+// 🔥 Save to Firebase cloud
+db.collection("reports").add(report)
+  .then(() => {
+    console.log("Saved to Firebase");
+    status.innerText = "✅ Report saved locally & to cloud";
+  })
+  .catch(err => {
+    console.error("Firebase error:", err);
+    status.innerText = "⚠ Saved locally, cloud sync failed";
+  });
 
-  form.reset();
+// Reset form
+form.reset();
+
 });

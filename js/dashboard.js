@@ -118,10 +118,6 @@ function drawChart() {
   });
 }
 
-// ---------- INIT ----------
-requestNotificationPermission();
-showAlerts();
-drawChart();
 // ---------- CSV EXPORT ----------
 function exportCSV() {
   const reports = getReports();
@@ -151,4 +147,42 @@ function exportCSV() {
   link.click();
   document.body.removeChild(link);
 }
+
+function clearData() {
+  if (!confirm("Are you sure you want to delete all reports?")) return;
+
+  localStorage.removeItem("reports");
+  alert("All data cleared. Start fresh logging.");
+  location.reload();
+}
+function showRecentActivity() {
+  const container = document.getElementById("recentActivity");
+  const reports = getReports();
+
+  if (!container) return;
+
+  const recent = reports
+    .slice()
+    .sort((a, b) => new Date(b.time) - new Date(a.time))
+    .slice(0, 5);
+
+  if (recent.length === 0) {
+    container.innerHTML = "<p>No recent activity.</p>";
+    return;
+  }
+
+  container.innerHTML = recent.map(r => `
+    <div style="border-left:4px solid #007bff;padding:6px;margin:6px 0;">
+      📍 ${r.village} — ${r.symptom}  
+      <br>
+      ⏱ ${new Date(r.time).toLocaleTimeString()}
+    </div>
+  `).join("");
+}
+
+// ---------- INIT ----------
+requestNotificationPermission();
+showAlerts();
+drawChart();
+showRecentActivity();
 
