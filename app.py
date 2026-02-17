@@ -51,10 +51,46 @@ def analyze_outbreaks():
 
     return results
 
+def calculate_trends(days=7):
+    reports = db.collection("reports").stream()
+
+    # Prepare date buckets
+    today = datetime.utcnow().date()
+    date_list = [today - timedelta(days=i) for i in range(days)]
+    date_list.reverse()
+
+    trends = {d.isoformat(): {} for d in date_list}
+
+    for doc in reports:
+        data = doc.to_dict()
+
+        try:
+            t = datetime.fromisoformat(data["time"].replace("Z", ""))
+            d = t.date().isoformat()
+
+            if d in trends:
+                village = data.get("village", "Unknown")
+                trends[d][village] = trends[d].get(village, 0) + 1
+        except Exception:
+            pass
+
+    # Convert to list for JSON response
+    result = []
+    for d in date_list:
+        entry = {"date": d.isoformat()}
+        entry.update(trends[d.isoformat()])
+        result.append(entry)
+
+    return result
+
 
 @app.route("/outbreaks")
 def outbreaks():
     return jsonify(analyze_outbreaks())
+@app.route("/trends")
+def trends():
+    return jsonify(calculate_trends())
+
 
 
 @app.route("/")
