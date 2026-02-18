@@ -35,6 +35,41 @@ function generateAlerts(reports) {
   return alerts;
 }
 
+// ---------- LIVE OUTBREAKS FROM FLASK ----------
+async function loadLiveOutbreaks() {
+  const container = document.getElementById("alerts");
+
+  if (!container) return;
+
+  try {
+    const res = await fetch("http://127.0.0.1:5000/outbreaks");
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      container.innerHTML = "<p>No outbreak data available.</p>";
+      return;
+    }
+
+    container.innerHTML = data.map(o => `
+      <div style="
+        border:2px solid ${o.status === "outbreak" ? "red" : "green"};
+        padding:12px;
+        margin:12px 0;
+        background:${o.status === "outbreak" ? "#ffe5e5" : "#e5ffe5"};
+        border-radius:8px;
+      ">
+        <b>${o.village}</b> — ${o.symptom}<br>
+        Cases (last 24h): ${o.recent_cases}<br>
+        Status: <b>${o.status.toUpperCase()}</b>
+      </div>
+    `).join("");
+
+  } catch (err) {
+    container.innerHTML = "<p>⚠ Unable to connect to live analytics API.</p>";
+    console.error("Live dashboard error:", err);
+  }
+}
+
 // ---------- NOTIFICATION ----------
 function requestNotificationPermission() {
   if ("Notification" in window && Notification.permission !== "granted") {
@@ -182,7 +217,8 @@ function showRecentActivity() {
 
 // ---------- INIT ----------
 requestNotificationPermission();
-showAlerts();
+loadLiveOutbreaks();
 drawChart();
 showRecentActivity();
+setInterval(loadLiveOutbreaks, 10000);
 
